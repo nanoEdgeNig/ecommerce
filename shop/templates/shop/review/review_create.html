@@ -1,0 +1,12 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Write Review</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p|safe }}
+    <button type="submit" class="btn btn-success">Submit</button>
+    <a href="{% url 'shop:review_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

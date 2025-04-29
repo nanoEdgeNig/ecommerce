@@ -1,0 +1,37 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Orders</h2>
+    <a href="{% url 'shop:order_create' %}" class="btn btn-success">New Order</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr><th>Order #</th><th>Product</th><th>Customer</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.pk }}</td>
+          <td>
+            {% for item in order.items.all %}
+              <div>{{ item.product.product_name }}</div>
+            {% endfor %}
+          </td>
+          <td>{{ order.ordered_by.username }}</td>
+          <td>{{ order.status }}</td>
+          <td>
+            <a href="{% url 'shop:order_detail' order.pk %}" class="btn btn-sm btn-info">View</a>
+            <a href="{% url 'shop:order_update' order.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'shop:order_delete' order.pk %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No orders found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ object.name }}</h2>
+  <p><strong>Price:</strong> ₦{{ object.price }}</p>
+  <p><strong>Description:</strong> {{ object.description }}</p>
+  <a href="{% url 'shop:product_update' object.pk %}" class="btn btn-warning">Edit</a>
+  <a href="{% url 'shop:product_delete' object.pk %}" class="btn btn-danger">Delete</a>
+  <a href="{% url 'shop:product_list' %}" class="btn btn-secondary">Back</a>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Edit Order #{{ object.pk }}</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p|safe }}
+    <button type="submit" class="btn btn-warning">Update Order</button>
+    <a href="{% url 'shop:order_list' %}" class="btn btn-secondary">Back</a>
+  </form>
+</div>
+{% endblock %}

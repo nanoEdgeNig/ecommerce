@@ -1,0 +1,12 @@
+{% extends 'dashboard.html' %}
+{% block title %}Category Detail{% endblock %}
+
+{% block content %}
+<h2>Category Details</h2>
+<ul class="list-group">
+    <li class="list-group-item"><strong>ID:</strong> {{ category.id }}</li>
+    <li class="list-group-item"><strong>Name:</strong> {{ category.category_name }}</li>
+</ul>
+<a href="{% url 'shop:category_update' category.id %}" class="btn btn-warning mt-3">Edit</a>
+<a href="{% url 'shop:category_list' %}" class="btn btn-secondary mt-3">Back to List</a>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Edit Product: {{ object.name }}</h2>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form.as_p|safe }}
+    <button type="submit" class="btn btn-warning">Update</button>
+    <a href="{% url 'shop:product_list' %}" class="btn btn-secondary">Back</a>
+  </form>
+</div>
+{% endblock %}

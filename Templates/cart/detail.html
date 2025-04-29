@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Your Cart</h2>
+  <form method="post" action="{% url 'shop:cart_update' %}">
+    {% csrf_token %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ item.product.product_name }}</td>
+            <td>
+              <input type="number" name="quantity_{{ item.product.id }}" value="{{ item.quantity }}" min="1" class="form-control" />
+            </td>
+            <td>NGN{{ item.product.price }}</td>
+            <td>NGN{{ item.subtotal }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+      <p><strong>Total: ₦{{ total }}</strong></p>
+      <div>
+        <button type="submit" class="btn btn-primary">Update Cart</button>
+        <button type="submit" formaction="{% url 'shop:checkout' %}" class="btn btn-success ml-2">Checkout</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
