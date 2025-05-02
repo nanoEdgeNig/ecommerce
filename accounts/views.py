@@ -8,6 +8,6 @@ from django.views.generic import CreateView
 class RegisterView(CreateView):
     template_name = 'registration/register.html'
     form_class = UserCreationForm
-    reverse_lazy = 'accounts:login'
+    success_url = reverse_lazy('accounts:login')
     
     

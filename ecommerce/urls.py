@@ -6,11 +6,10 @@ from django.urls import path, include
 from shop.views import IndexView, AboutView, ContactView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('', IndexView.as_view(), name='index'),
     path('about', AboutView.as_view(), name='about'),
     path('contact', ContactView.as_view(), name='contact'),
-    path('shop/', include('shop.urls')),
+    path('shop/dashboard/', ContactView.as_view(), name='contact'),
     
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

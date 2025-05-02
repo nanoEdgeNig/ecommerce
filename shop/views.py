@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.db.models import F
 from django.contrib import messages
 
-
 class IndexView(ListView):
     model = Product
     template_name = 'index.html'
