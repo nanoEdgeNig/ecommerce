@@ -3,6 +3,8 @@
 {% block content %}
 <div class="container mt-4">
   <h2>Your Cart</h2>
+
+  <!-- Update Quantities Form -->
   <form method="post" action="{% url 'shop:cart_update' %}">
     {% csrf_token %}
     <div class="table-responsive">
@@ -20,7 +22,13 @@
           <tr>
             <td>{{ item.product.product_name }}</td>
             <td>
-              <input type="number" name="quantity_{{ item.product.id }}" value="{{ item.quantity }}" min="1" class="form-control" />
+              <input
+                type="number"
+                name="quantity_{{ item.product.id }}"
+                value="{{ item.quantity }}"
+                min="1"
+                class="form-control"
+              />
             </td>
             <td>NGN{{ item.product.price }}</td>
             <td>NGN{{ item.subtotal }}</td>
@@ -31,11 +39,14 @@
     </div>
     <div class="d-flex justify-content-between align-items-center">
       <p><strong>Total: ₦{{ total }}</strong></p>
-      <div>
-        <button type="submit" class="btn btn-primary">Update Cart</button>
-        <button type="submit" formaction="{% url 'shop:checkout' %}" class="btn btn-success ml-2">Checkout</button>
-      </div>
+      <button type="submit" class="btn btn-primary">Update Cart</button>
     </div>
+  </form>
+
+  <!-- Checkout Form -->
+  <form method="post" action="{% url 'shop:checkout' %}" class="mt-3 text-right">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">Proceed to Checkout</button>
   </form>
 </div>
 {% endblock %}

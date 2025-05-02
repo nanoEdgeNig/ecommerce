@@ -14,7 +14,10 @@
         <a class="navbar-brand" href="#">Dashboard</a>
         <div class="ms-auto">
             <span class="navbar-text me-3">Hi, {{ user.username }}</span>
-            <a href="{% url 'accounts:logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+            </form>
         </div>
     </nav>
 

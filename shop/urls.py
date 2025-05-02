@@ -5,7 +5,6 @@ from .views import (
     ReviewListView, ReviewCreateView, ReviewUpdateView, ReviewDetailView, ReviewDeleteView,
     OrderListView, OrderCreateView, OrderUpdateView, OrderDetailView, OrderDeleteView,
     DashboardIndexView, AddToCartView, CartDetailView, CheckoutView, CartUpdateView, OrderSuccessView
-    
 )
 
 app_name = 'shop'
