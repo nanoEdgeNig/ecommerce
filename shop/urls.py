@@ -4,7 +4,8 @@ from .views import (
     ProductListView, ProductCreateView, ProductUpdateView, ProductDetailView, ProductDeleteView,
     ReviewListView, ReviewCreateView, ReviewUpdateView, ReviewDetailView, ReviewDeleteView,
     OrderListView, OrderCreateView, OrderUpdateView, OrderDetailView, OrderDeleteView,
-    DashboardIndexView, AddToCartView, CartDetailView, CheckoutView, CartUpdateView, OrderSuccessView
+    DashboardIndexView, AddToCartView, CartDetailView, CheckoutView, CartUpdateView, OrderSuccessView,
+    ShopProductDetailView, CartRemoveItemView
 )
 
 app_name = 'shop'
@@ -24,6 +25,7 @@ urlpatterns = [
     path('products/create/', ProductCreateView.as_view(), name='product_create'),
     path('products/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
     path('products/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
+    path('products/shop/<int:pk>/', ShopProductDetailView.as_view(), name='shop_product_detail'),
     path('products/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
     
     # review
@@ -45,5 +47,6 @@ urlpatterns = [
     path('cart/', CartDetailView.as_view(), name='cart_detail'),
     path('cart/update/', CartUpdateView.as_view(), name='cart_update'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
+    path('cart/remove/<int:product_id>/', CartRemoveItemView.as_view(), name='cart_remove_item'),
     path('cart/success/<int:order_id>/', OrderSuccessView.as_view(), name='order_success'),
 ]

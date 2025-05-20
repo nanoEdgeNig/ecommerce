@@ -1,7 +1,49 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
-<h2>Order Successful!</h2>
-<p>Order #{{ order.id }} placed.</p>
+<div class="container mt-5">
+  <div class="text-center">
+    <h2 class="text-success">Order Successful!</h2>
+    <p class="text-muted">Order #{{ order.id }} placed on {{ order.ordered_on|date:"F j, Y, g:i a" }}</p>
+  </div>
 
+  <div class="card mt-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">Receipt</h5>
+      <div class="table-responsive">
+        <table class="table">
+          <thead class="table-light">
+            <tr>
+              <th>Product</th>
+              <th class="text-center">Quantity</th>
+              <th class="text-center">Unit Price</th>
+              <th class="text-end">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+              <tr>
+                <td>{{ item.product.product_name }}</td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-center">₦{{ item.product.price|intcomma }}</td>
+                <td class="text-end">₦{{ item.subtotal|intcomma }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-end"><strong>Total:</strong></td>
+              <td class="text-end"><strong>₦{{ order.get_total_amount|intcomma }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'index' %}" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</div>
 {% endblock %}

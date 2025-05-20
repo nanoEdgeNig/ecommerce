@@ -26,6 +26,7 @@ class Product(models.Model):
 class Order(models.Model):
     STATUS_OPTIONS = [
         ('PENDING', 'Pending'),
+        ('PLACED', 'Placed'),
         ('DELIVERED', 'Delivered'),
         ('CANCELED', 'Canceled'),
     ]
@@ -37,7 +38,7 @@ class Order(models.Model):
     def __str__(self):
         return f'Order #{self.pk} by {self.ordered_by.username}'
 
-    def total_amount(self):
+    def get_total_amount(self):
         return sum(item.subtotal() for item in self.items.all())
 
 

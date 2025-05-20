@@ -90,6 +90,10 @@ class ProductUpdateView(UpdateView):
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'shop/product/product_detail.html'
+    
+class ShopProductDetailView(DetailView):
+    model = Product
+    template_name = 'shop/product/shop_product_detail.html'
 
 class ProductDeleteView(DeleteView):
     model = Product
@@ -159,10 +163,12 @@ class OrderDeleteView(DeleteView):
 class AddToCartView(LoginRequiredMixin, View):
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
+
         try:
             qty = max(int(request.POST.get('quantity', 1)), 1)
-        except ValueError:
+        except (ValueError, TypeError):
             qty = 1
+            
         order = (
             Order.objects
                  .filter(ordered_by=request.user, status='PENDING')
@@ -175,6 +181,7 @@ class AddToCartView(LoginRequiredMixin, View):
                 status='PENDING',
                 ordered_on=timezone.now()
             )
+
         item, created = OrderItem.objects.get_or_create(
             order=order,
             product=product,
@@ -182,41 +189,64 @@ class AddToCartView(LoginRequiredMixin, View):
         )
         item.quantity += qty
         item.save()
-        return redirect('shop:cart_detail')
+
+        return redirect('index')
+
 
 class CartDetailView(LoginRequiredMixin, View):
     def get(self, request):
-        order = Order.objects.filter(
-            ordered_by=request.user, status='PENDING'
-        ).order_by('-ordered_on').first()
-        items = order.items.select_related('product') if order else []
-        total = sum(item.subtotal() for item in items)
+
+        order = (
+            Order.objects
+                 .filter(ordered_by=request.user, status='PENDING')
+                 .order_by('-ordered_on')
+                 .first()
+        )
+
+        if order:
+            items = order.items.select_related('product').all()
+            total = sum(item.subtotal() for item in items)
+        else:
+            items = []
+            total = 0
+
         return render(request, 'cart/detail.html', {
             'items': items,
             'total': total
         })
 
+
 class CartUpdateView(LoginRequiredMixin, View):
     def post(self, request):
-        order = Order.objects.filter(
-            ordered_by=request.user, status='PENDING'
-        ).order_by('-ordered_on').first()
+
+        order = (
+            Order.objects
+                 .filter(ordered_by=request.user, status='PENDING')
+                 .order_by('-ordered_on')
+                 .first()
+        )
         if not order:
             messages.error(request, "You have no items in your cart.")
             return redirect('shop:cart_detail')
+
         updated = False
-        for key, raw in request.POST.items():
+
+        for key, raw_val in request.POST.items():
             if not key.startswith('quantity_'):
                 continue
+
             try:
-                pid = int(key.split('_', 1)[1])
-                new_q = int(raw)
+                _, pid_str = key.split('_', 1)
+                pid = int(pid_str)
+                new_q = int(raw_val)
             except (ValueError, IndexError):
                 continue
+
             try:
                 item = OrderItem.objects.get(order=order, product_id=pid)
             except OrderItem.DoesNotExist:
                 continue
+
             if new_q <= 0:
                 item.delete()
                 updated = True
@@ -224,22 +254,31 @@ class CartUpdateView(LoginRequiredMixin, View):
                 item.quantity = new_q
                 item.save()
                 updated = True
+
         if not order.items.exists():
             order.delete()
+
         if updated:
             messages.success(request, "Your cart has been updated.")
         else:
             messages.info(request, "No changes detected in your cart.")
+
         return redirect('shop:cart_detail')
 
+
 class CheckoutView(LoginRequiredMixin, View):
+
     def post(self, request):
-        order = Order.objects.filter(
-            ordered_by=request.user, status='PENDING'
-        ).order_by('-ordered_on').first()
+        order = (
+            Order.objects
+                 .filter(ordered_by=request.user, status='PENDING')
+                 .order_by('-ordered_on')
+                 .first()
+        )
         if not order or not order.items.exists():
             messages.error(request, "Your cart is empty.")
             return redirect('shop:cart_detail')
+
         for item in order.items.select_related('product'):
             if item.product.stock < item.quantity:
                 messages.error(
@@ -248,16 +287,45 @@ class CheckoutView(LoginRequiredMixin, View):
                     f"(only {item.product.stock} left)."
                 )
                 return redirect('shop:cart_detail')
-        for item in order.items.all():
-            Product.objects.filter(id=item.product.id) \
-                           .update(stock=F('stock') - item.quantity)
+
+        for item in order.items.select_related('product'):
+            Product.objects.filter(id=item.product.id).update(
+                stock=F('stock') - item.quantity
+            )
+
         order.status = 'PLACED'
         order.ordered_on = timezone.now()
         order.save()
+
         messages.success(request, "Order placed successfully!")
         return redirect('shop:order_success', order_id=order.id)
+    
+    
+class CartRemoveItemView(LoginRequiredMixin, View):
+    def post(self, request, product_id):
+        order = (
+            Order.objects
+                 .filter(ordered_by=request.user, status='PENDING')
+                 .order_by('-ordered_on')
+                 .first()
+        )
+        if not order:
+            messages.error(request, "No active cart found.")
+            return redirect('shop:cart_detail')
 
-class OrderSuccessView(TemplateView):
+        try:
+            item = OrderItem.objects.get(order=order, product_id=product_id)
+            item.delete()
+            messages.success(request, "Item removed from cart.")
+        except OrderItem.DoesNotExist:
+            messages.warning(request, "Item not found in cart.")
+
+        if not order.items.exists():
+            order.delete()
+
+        return redirect('shop:cart_detail')
+    
+class OrderSuccessView(LoginRequiredMixin, TemplateView):
     template_name = 'cart/success.html'
 
     def get_context_data(self, **kwargs):
